@@ -14,7 +14,7 @@ namespace ChatServer
     {
         protected internal string Id { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
-        string userName;
+        public string UserName;
         TcpClient client;
         ServerObject server;
 
@@ -32,24 +32,25 @@ namespace ChatServer
             {
                 Stream = client.GetStream();
                 string message = GetMessage();
-                userName = message;
+                UserName = message;
 
-                message = userName + " вошел в чат.";
+                message = UserName + " вошел в чат.";
                 server.BroadcastMessage(message, this.Id);
                 Console.WriteLine(message);
+                server.SendUserList(this.Id);
 
                 while (true)
                 {
                     try
                     {
                         message = GetMessage();
-                        message = String.Format("{0}: {1}", userName, message);
+                        message = String.Format("{0}: {1}", UserName, message);
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
                     }
                     catch
                     {
-                        message = String.Format("{0} покинул чат.", userName);
+                        message = String.Format("{0} покинул чат.", UserName);
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
                         break;

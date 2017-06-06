@@ -11,7 +11,8 @@ namespace ChatServer
 {
     class ServerObject
     {
-        static TcpListener tcpListener; 
+        static TcpListener tcpListener;
+        const int PORT = 8888;
         List<ClientObject> clients = new List<ClientObject>(); 
 
         protected internal void AddConnection(ClientObject clientObject)
@@ -29,7 +30,7 @@ namespace ChatServer
         {
             try
             {
-                tcpListener = new TcpListener(IPAddress.Any, 8888);
+                tcpListener = new TcpListener(IPAddress.Any, PORT);
                 tcpListener.Start();
                 Console.WriteLine("Сервер запущен. Ожидание подключений...");
 
@@ -56,6 +57,20 @@ namespace ChatServer
             {                
                 clients[i].Stream.Write(data, 0, data.Length);                
             }
+        }
+
+        protected internal void SendUserList(string id)
+        {
+            String message = "";
+            message += "ListUpdate";
+            foreach (var client in clients)
+                message += ":" + client.UserName;
+
+            int i;
+            for (i = 0; clients[i].Id != id; i++) ;
+
+            byte[] data = Encoding.Unicode.GetBytes(message);
+            clients[i].Stream.Write(data, 0, data.Length);
         }
 
         protected internal void Disconnect()
